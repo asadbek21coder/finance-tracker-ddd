@@ -13,7 +13,6 @@ import (
 	"github.com/asadbek21coder/fintracker2/internal/app"
 	"github.com/asadbek21coder/fintracker2/internal/db"
 	"github.com/asadbek21coder/fintracker2/internal/delivery/rest"
-	"github.com/asadbek21coder/fintracker2/internal/domain"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/cast"
@@ -37,7 +36,7 @@ func main() {
 	services := app.NewUserUseCase(db, repos)
 	handlers := rest.NewHandler(services)
 
-	srv := new(domain.Server)
+	srv := new(Server)
 	go func() {
 		if err := srv.Run(os.Getenv("RPC_PORT"), handlers.InitRoutes()); err != nil {
 			log.Fatal("error occured while running http server: ", err.Error())
