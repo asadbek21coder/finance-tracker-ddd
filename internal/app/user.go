@@ -10,7 +10,7 @@ type UserUseCase struct {
 	userRepo domain.UserRepository
 }
 
-func NewUserUseCase(db *sqlx.DB, userRepo domain.UserRepository) domain.UserUseCase {
+func NewUserUseCase(db *sqlx.DB) domain.UserUseCase {
 	return UserUseCase{userRepo: adapters.NewUserRepository(db)}
 }
 

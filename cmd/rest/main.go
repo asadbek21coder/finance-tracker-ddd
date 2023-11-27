@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/asadbek21coder/fintracker2"
 	"github.com/asadbek21coder/fintracker2/config"
-	"github.com/asadbek21coder/fintracker2/internal/adapters"
-	"github.com/asadbek21coder/fintracker2/internal/app"
 	"github.com/asadbek21coder/fintracker2/internal/db"
-	"github.com/asadbek21coder/fintracker2/internal/delivery/rest"
+	"github.com/asadbek21coder/fintracker2/internal/delivery/rest/router"
+
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/cast"
@@ -24,7 +24,6 @@ func main() {
 	}
 	dotenv := cast.ToString(config.GetOrReturnDefault("DOT_ENV_PATH", ".env"))
 	cfg := config.Load(dotenv)
-	// log := logger.New(cfg.LogLevel)
 
 	db, err := db.ConnectToDb(cfg)
 
@@ -32,18 +31,16 @@ func main() {
 		log.Fatal("failed to initialize db: ", err.Error())
 	}
 
-	repos := adapters.NewUserRepository(db)
-	services := app.NewUserUseCase(db, repos)
-	handlers := rest.NewHandler(services)
+	// repos := adapters.NewUserRepository(db)
+	// services := app.NewUserUseCase(db, repos)
+	// router.InitRoutes(db)
 
-	srv := new(Server)
+	srv := new(fintracker2.Server)
 	go func() {
-		if err := srv.Run(os.Getenv("RPC_PORT"), handlers.InitRoutes()); err != nil {
-			log.Fatal("error occured while running http server: ", err.Error())
+		if err := srv.Run(os.Getenv("RPC_PORT"), router.InitRoutes(db)); err != nil {
+			log.Fatal("error occured while running http server: ", err)
 		}
 	}()
-
-	fmt.Print("Demo app Started")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)

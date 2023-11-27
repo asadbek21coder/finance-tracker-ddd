@@ -1,4 +1,4 @@
-package rest
+package handler
 
 import (
 	"fmt"
@@ -8,12 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) createUser(c *gin.Context) {
+type UserHandler struct {
+	UserUseCase domain.UserUseCase
+}
+
+func (h *UserHandler) CreateUser(c *gin.Context) {
 	body := domain.CreateUserReq{}
 
 	c.ShouldBindJSON(&body)
 
-	res, err := h.usecase.CreateUser(domain.CreateUserReq{
+	res, err := h.UserUseCase.CreateUser(domain.CreateUserReq{
 		Name:  body.Name,
 		Email: body.Email,
 	})
